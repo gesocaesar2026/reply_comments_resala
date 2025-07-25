@@ -37,10 +37,12 @@ MESSAGES = [
 # تحميل أو إنشاء ملف التعليقات التي تم الرد عليها
 REPLIED_FILE = "replied.json"
 if os.path.exists(REPLIED_FILE):
-    with open(REPLIED_FILE, "r") as f:
+    try:
+    with open('replied.json', 'r') as f:
         replied = set(json.load(f))
-else:
+except (FileNotFoundError, json.JSONDecodeError):
     replied = set()
+
 
 def get_posts():
     res = requests.get(GRAPH_API_URL, headers=HEADERS)
