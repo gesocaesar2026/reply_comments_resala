@@ -66,9 +66,8 @@ def main():
             comment_id = comment["id"]
             if comment_id in replied:
                 continue
-            message = f"شكراً على تعليقك ❤️ رسالة المسيح ليك:
+            message = f"شكراً على تعليقك ❤️ رسالة المسيح ليك:\n{random.choice(messages)}"
 
-{random.choice(MESSAGES)}"
             if reply_to_comment(comment_id, message):
                 replied.add(comment_id)
 
