@@ -38,7 +38,7 @@ try:
 except (FileNotFoundError, json.JSONDecodeError):
     replied = set()
 
-def get_last_posts(limit=2):
+def get_last_posts(limit=3):
     url = f"https://graph.facebook.com/v19.0/{PAGE_ID}/posts?limit={limit}&access_token={ACCESS_TOKEN}"
     res = requests.get(url)
     if res.status_code == 200:
@@ -48,7 +48,8 @@ def get_last_posts(limit=2):
         return []
 
 def get_comments(post_id):
-    url = f"https://graph.facebook.com/v19.0/{post_id}/comments?filter=stream&access_token={ACCESS_TOKEN}"
+    # filter=toplevel لجلب تعليقات المستوى الأول فقط
+    url = f"https://graph.facebook.com/v19.0/{post_id}/comments?filter=toplevel&access_token={ACCESS_TOKEN}"
     res = requests.get(url)
     if res.status_code == 200:
         return res.json().get("data", [])
@@ -74,9 +75,7 @@ for post in posts:
         comment_id = comment["id"]
         commenter_id = comment.get("from", {}).get("id", "")
 
-        # تجاهل التعليق إذا:
-        # 1. تم الرد عليه مسبقًا
-        # 2. كاتبه هو نفس صفحة البيدج
+        # تجاهل التعليق إذا تم الرد عليه مسبقًا أو كاتبه هو الصفحة
         if comment_id in replied:
             continue
         if commenter_id == PAGE_ID:
@@ -92,6 +91,6 @@ for post in posts:
         else:
             print(f"❌ فشل الرد على: {comment_id}")
 
-# حفظ ملف التعليقات التي تم الرد عليها
+# حفظ التعليقات التي تم الرد عليها
 with open('replied.json', 'w') as f:
     json.dump(list(replied), f)
